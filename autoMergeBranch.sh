@@ -1,5 +1,5 @@
 #!/bin/bash
-# Small shell script to merge in the specific branch for the task type you are working on
+# Shell script to merge in the specific branch for the git flow task type you are working on
 
 function getBranch {
     git branch | grep '*' | sed 's/* //'
@@ -7,10 +7,12 @@ function getBranch {
 
 # Get the current branch
 BRANCH=$(getBranch)
+
 # Remove all the text from the branch after the slash
 TASK=${BRANCH%/*}
 echo 'The task type is: ' $TASK
 
+# Check type of task
 case $TASK in
     'feature')
         BRANCH2MERGE='develop'
@@ -27,7 +29,12 @@ esac
 git checkout $BRANCH2MERGE
 
 # Pull current branch
-git pull
+if ! git pull 
+then
+    echo 'Git pull failed'
+    git checkout $BRANCH
+    exit 1
+fi
 
 # Go back to task branch
 git checkout $BRANCH
